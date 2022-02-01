@@ -25,9 +25,9 @@ class LoginPageState extends BaseScreenState {
 
   @override
   void initState() {
+    super.initState();
     _emailController = TextEditingController();
     //getData();
-    super.initState();
   }
 
   _emailRequestFocus() {
@@ -44,7 +44,7 @@ class LoginPageState extends BaseScreenState {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
@@ -60,11 +60,10 @@ class LoginPageState extends BaseScreenState {
       ),
       body: Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-          Colors.lightBlue,
-          Colors.greenAccent,
-          Colors.yellowAccent
-        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+            gradient: LinearGradient(
+                colors: [Colors.white, Colors.greenAccent, Colors.yellowAccent],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter)),
         child: Center(
           child: Padding(
             padding: EdgeInsets.all(10),
@@ -207,7 +206,9 @@ class LoginPageState extends BaseScreenState {
                           style: TextStyle(
                             fontSize: 15,
                           )),
-                      onPressed: () {}),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/homescreen');
+                      }),
                 ),
                 Container(
                     child: Row(
