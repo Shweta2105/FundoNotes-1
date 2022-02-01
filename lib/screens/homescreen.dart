@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/screens/createnewnotes.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class HomeScreen extends BaseScreen {
@@ -39,6 +40,7 @@ class HomeScreenState extends BaseScreenState {
       body: const Center(child: Text('Press the button below!')),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
+            Navigator.pushNamed(context, '/createnewnotes');
             // Add your onPressed code here!
           },
           child: const Icon(

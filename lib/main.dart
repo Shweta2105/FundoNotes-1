@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fundonotes/screens/createnewnotes.dart';
 import 'package:fundonotes/screens/homescreen.dart';
 import 'package:fundonotes/screens/loginpage.dart';
 import 'package:fundonotes/screens/registrationpage.dart';
@@ -19,6 +20,7 @@ void main() async {
       '/loginpage': (context) => LoginPage(),
       '/registrationpage': (context) => RegistrationPage(),
       '/homescreen': (context) => HomeScreen(),
+      'creatnewnotes': (context) => CreateNewNote(),
     },
   ));
 }

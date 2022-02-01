@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/resources/authmethod.dart';
+import 'package:fundonotes/utils/pickimage.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RegistrationPage extends BaseScreen {
+  const RegistrationPage({Key? key}) : super(key: key);
   @override
   RegistrationPageState createState() => new RegistrationPageState();
 }
@@ -28,6 +34,7 @@ class RegistrationPageState extends BaseScreenState {
   RegExp passwordRegExp =
       new RegExp(r"^(?=.*?[0-9a-zA-Z])[0-9a-zA-Z]*[@#$%!][0-9a-zA-Z]*$");
 
+  Uint8List? _image;
   void initState() {
     fnameController = TextEditingController();
     super.initState();
@@ -55,6 +62,23 @@ class RegistrationPageState extends BaseScreenState {
     setState(() {
       FocusScope.of(context).requestFocus(_passwordFocus);
     });
+  }
+
+  void selectProfileImage() async {
+    Uint8List im = await PickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+  signUpUser() {
+    AuthMethod.SignupUser(
+      email: _emailController.text,
+      username: fnameController.text,
+      password: _passwordController.text,
+      file: _image!,
+    );
+    Navigator.pop(context);
   }
 
   @override
@@ -115,15 +139,22 @@ class RegistrationPageState extends BaseScreenState {
                       ),
                       Stack(
                         children: [
-                          const CircleAvatar(
-                              radius: 55,
-                              backgroundImage: NetworkImage(
-                                  'https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max')),
+                          _image != null
+                              ? CircleAvatar(
+                                  radius: 55,
+                                  backgroundImage: MemoryImage(_image!))
+                              : const CircleAvatar(
+                                  radius: 55,
+                                  backgroundImage: NetworkImage(
+                                      'https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png'),
+                                ),
                           Positioned(
                               bottom: -10,
                               left: 70,
                               child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    selectProfileImage();
+                                  },
                                   icon: const Icon(Icons.add_a_photo)))
                         ],
                       ),
@@ -311,7 +342,7 @@ class RegistrationPageState extends BaseScreenState {
                               'SignUp',
                               style: TextStyle(fontSize: 15),
                             ),
-                            onPressed: () {},
+                            onPressed: signUpUser,
                           )),
                       Container(
                           child: Row(
