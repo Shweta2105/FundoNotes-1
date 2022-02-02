@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class CreateNewNote extends BaseScreen {
   @override
@@ -13,11 +17,37 @@ class CreateNewNote_state extends BaseScreenState {
   TextEditingController bodyController = new TextEditingController();
   FocusNode titleFocus = new FocusNode();
 
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  var loggedInUser;
+  final CollectionReference _notesCollection =
+      FirebaseFirestore.instance.collection('notes');
+
+  Future<User> getCurrentUser() async {
+    final user = await _auth.currentUser;
+    loggedInUser = user!.uid;
+
+    return loggedInUser;
+  }
+
+  uploadData() async {
+    Map<String, dynamic> data = <String, dynamic>{
+      'uid': loggedInUser,
+      'title': titleController.text,
+      'description': bodyController.text
+    };
+    await _notesCollection
+        .add(data)
+        .whenComplete(() => print("User added notes"))
+        .catchError((e) => print(e));
+  }
+
+
+
   @override
   void initState() {
-    titleController = TextEditingController();
-
     super.initState();
+    getCurrentUser();
+    titleController = TextEditingController();
   }
 
   _titleRequestFocus() {
@@ -34,6 +64,7 @@ class CreateNewNote_state extends BaseScreenState {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
+              uploadData();
               Navigator.pop(context);
             },
             icon: Icon(

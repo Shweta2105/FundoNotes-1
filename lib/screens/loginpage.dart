@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends BaseScreen {
   @override
@@ -11,6 +12,9 @@ class LoginPage extends BaseScreen {
 }
 
 class LoginPageState extends BaseScreenState {
+  // FirebaseAuth _auth = FirebaseAuth.instance;
+  // User? loggedInUser;
+
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   FocusNode _emailFocus = new FocusNode();
@@ -29,6 +33,14 @@ class LoginPageState extends BaseScreenState {
     _emailController = TextEditingController();
     //getData();
   }
+
+  // void getCurrentUser() {
+  //   final user = _auth.currentUser;
+  //   if (user != null) {
+  //     loggedInUser = user;
+  //     print(loggedInUser);
+  //   }
+  // }
 
   _emailRequestFocus() {
     setState(() {

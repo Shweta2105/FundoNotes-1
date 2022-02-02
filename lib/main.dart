@@ -1,3 +1,6 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/screens/createnewnotes.dart';
@@ -8,6 +11,15 @@ import 'package:fundonotes/screens/registrationpage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  User? loggedInUser;
+
+  final user = _auth.currentUser;
+  if (user != null) {
+    loggedInUser = user;
+    print("---------------${loggedInUser}----------------");
+  }
+
   runApp(MaterialApp(
     home: LoginPage(),
     title: "Fundo Notes",
@@ -15,7 +27,7 @@ void main() async {
       primarySwatch: Colors.blue,
     ),
     debugShowCheckedModeBanner: false,
-    initialRoute: '/loginpage',
+    initialRoute: loggedInUser == null ? '/loginpage' : '/homescreen',
     routes: {
       '/loginpage': (context) => LoginPage(),
       '/registrationpage': (context) => RegistrationPage(),
@@ -24,6 +36,7 @@ void main() async {
     },
   ));
 }
+
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({Key? key}) : super(key: key);
