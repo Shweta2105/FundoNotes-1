@@ -5,6 +5,8 @@ import 'package:fundonotes/screens/createnewnotes.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class HomeScreen extends BaseScreen {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   HomeScreenState createState() => new HomeScreenState();
 }
@@ -29,24 +31,40 @@ class HomeScreenState extends BaseScreenState {
                 Icons.grid_view,
                 color: Colors.black,
               )),
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.settings_power,
-              )),
-          CircleAvatar(),
+          SizedBox(
+            width: 10,
+          ),
+          // IconButton(
+          //     onPressed: () {},
+          //     icon: Icon(
+          //       Icons.settings_power,
+          //     )),
+          CircleAvatar(
+            backgroundColor: Colors.blueAccent,
+          ),
+          SizedBox(
+            width: 20,
+          )
         ],
       ),
-      body: const Center(child: Text('Press the button below!')),
+      body: const Center(
+        child: Text("Press below to create new notes"),
+      ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/createnewnotes');
-            // Add your onPressed code here!
-          },
-          child: const Icon(
-            Icons.add_circle,
-            color: Colors.blue,
-          )),
+        foregroundColor: Colors.amber,
+        focusColor: Colors.white10,
+        hoverColor: Colors.green,
+        backgroundColor: Colors.white,
+        splashColor: Colors.tealAccent,
+        onPressed: () => {},
+        child: Builder(
+            builder: (context) => IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => CreateNewNote()));
+                },
+                icon: Image.asset("assets/images/addIcon.jpg"))),
+      ),
     );
   }
 }
