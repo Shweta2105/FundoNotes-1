@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/models/common/styles.dart';
+import 'package:fundonotes/resources/authmethod.dart';
+import 'package:fundonotes/utils/usermethod.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fundonotes/models/common/constants.dart';
 
 class LoginPage extends BaseScreen {
   @override
@@ -12,7 +16,7 @@ class LoginPage extends BaseScreen {
 }
 
 class LoginPageState extends BaseScreenState {
-  // FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   // User? loggedInUser;
 
   TextEditingController _emailController = TextEditingController();
@@ -22,25 +26,12 @@ class LoginPageState extends BaseScreenState {
 
   bool emailValid = true;
   bool passwordValid = true;
-  RegExp emailRegExp = new RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-  RegExp passwordRegExp =
-      new RegExp(r"^(?=.*?[0-9a-zA-Z])[0-9a-zA-Z]*[@#$%!][0-9a-zA-Z]*$");
-
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
     //getData();
   }
-
-  // void getCurrentUser() {
-  //   final user = _auth.currentUser;
-  //   if (user != null) {
-  //     loggedInUser = user;
-  //     print(loggedInUser);
-  //   }
-  // }
 
   _emailRequestFocus() {
     setState(() {
@@ -56,14 +47,14 @@ class LoginPageState extends BaseScreenState {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: backcolor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 10.0,
         title: Text('FundoNotes Login',
             style: TextStyle(
-              color: HexColor('#151B54'),
+              color: titlecolor,
               fontWeight: FontWeight.w400,
               fontSize: 25,
               fontStyle: FontStyle.italic,
@@ -85,7 +76,7 @@ class LoginPageState extends BaseScreenState {
                   alignment: Alignment.center,
                   padding: EdgeInsets.all(10),
                   child: Card(
-                    color: HexColor('#FFFFFF'),
+                    color: whitebackcolor,
                     elevation: 10,
                     child: Container(
                       height: 100,
@@ -118,7 +109,7 @@ class LoginPageState extends BaseScreenState {
                     style: new TextStyle(
                         fontStyle: FontStyle.normal,
                         fontSize: 20,
-                        color: HexColor('#606E74')),
+                        color: textcolor),
                     decoration: InputDecoration(
                         labelText: 'Email Id',
                         errorText: emailValid ? null : "Invalid email",
@@ -162,7 +153,7 @@ class LoginPageState extends BaseScreenState {
                         style: new TextStyle(
                             fontStyle: FontStyle.normal,
                             fontSize: 20,
-                            color: HexColor('#606E74')),
+                            color: textcolor),
                         decoration: InputDecoration(
                             labelText: 'Password',
                             errorText:
@@ -202,7 +193,7 @@ class LoginPageState extends BaseScreenState {
                           'Forgot Password',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: buttoncolorblue,
                             fontSize: 15,
                           ),
                         ),
@@ -212,14 +203,15 @@ class LoginPageState extends BaseScreenState {
                   height: 50,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                   child: RaisedButton(
-                      textColor: Colors.white,
-                      color: Colors.blue,
+                      textColor: buttoncolorwhite,
+                      color: buttoncolorblue,
                       child: Text('Login',
                           style: TextStyle(
                             fontSize: 15,
                           )),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/homescreen');
+                        UserMethod().loginUser(context, _emailController.text,
+                            _passwordController.text);
                       }),
                 ),
                 Container(
@@ -227,7 +219,7 @@ class LoginPageState extends BaseScreenState {
                   children: <Widget>[
                     Text('Does not have account?'),
                     FlatButton(
-                      textColor: Colors.blue,
+                      textColor: buttoncolorblue,
                       child: Text(
                         'Sign in',
                         style: TextStyle(fontSize: 15),

@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/models/common/constants.dart';
 import 'package:fundonotes/resources/authmethod.dart';
 import 'package:fundonotes/utils/pickimage.dart';
+import 'package:fundonotes/utils/usermethod.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -18,25 +20,20 @@ class RegistrationPageState extends BaseScreenState {
   TextEditingController fnameController = TextEditingController();
   TextEditingController lnameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
   FocusNode fnameFocus = new FocusNode();
   FocusNode lnameFocus = new FocusNode();
   FocusNode _passwordFocus = new FocusNode();
   FocusNode _emailFocus = new FocusNode();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController confirmPassword = TextEditingController();
+
   bool fnameValid = true;
   bool lnameValid = true;
   bool emailValid = true;
   bool passwordValid = true;
   bool matchPassword = true;
-  RegExp emailRegExp = new RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-  RegExp passwordRegExp =
-      new RegExp(r"^(?=.*?[0-9a-zA-Z])[0-9a-zA-Z]*[@#$%!][0-9a-zA-Z]*$");
-
   Uint8List? _image;
   void initState() {
-    fnameController = TextEditingController();
     super.initState();
   }
 
@@ -71,15 +68,20 @@ class RegistrationPageState extends BaseScreenState {
     });
   }
 
-  signUpUser() {
-    AuthMethod.SignupUser(
-      email: _emailController.text,
-      username: fnameController.text,
-      password: _passwordController.text,
-      file: _image!,
-    );
-    Navigator.pop(context);
-  }
+  // signUpUser() async {
+  //   String result = await AuthMethod.SignupUser(
+  //     email: _emailController.text,
+  //     username: fnameController.text,
+  //     password: _passwordController.text,
+  //     file: _image!,
+  //   );
+  //   if (result == 'success') {
+  //     Navigator.pop(context);
+  //   } else {
+  //     //show snackbar to user
+
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +168,10 @@ class RegistrationPageState extends BaseScreenState {
                           focusNode: fnameFocus,
                           onTap: _fnameRequestFocus,
                           onChanged: (value) {
-                            value.length <= 15
-                                ? fnameValid = true
-                                : fnameValid = false;
+                            fnameValid = value.length <= 15;
+                            // value.length <= 15
+                            //     ? fnameValid = true
+                            //     : fnameValid = false;
                             setState(() {});
                           },
                           // ignore: unnecessary_new
@@ -208,15 +211,14 @@ class RegistrationPageState extends BaseScreenState {
                           focusNode: lnameFocus,
                           onTap: _lnameRequestFocus,
                           onChanged: (value) {
-                            value.length <= 15
-                                ? lnameValid = true
-                                : lnameValid = false;
+                            lnameValid = value.length <= 15;
+
                             setState(() {});
                           },
                           style: new TextStyle(
                               fontStyle: FontStyle.normal,
                               fontSize: 20,
-                              color: HexColor('#606E74')),
+                              color: textcolor),
                           decoration: InputDecoration(
                               labelText: 'Last Name',
                               errorText:
@@ -259,7 +261,7 @@ class RegistrationPageState extends BaseScreenState {
                           style: new TextStyle(
                               fontStyle: FontStyle.normal,
                               fontSize: 20,
-                              color: HexColor('#606E74')),
+                              color: textcolor),
                           decoration: InputDecoration(
                               labelText: 'Email Id',
                               errorText: emailValid ? null : "Invalid email",
@@ -304,7 +306,7 @@ class RegistrationPageState extends BaseScreenState {
                               style: new TextStyle(
                                   fontStyle: FontStyle.normal,
                                   fontSize: 20,
-                                  color: HexColor('#606E74')),
+                                  color: textcolor),
                               decoration: InputDecoration(
                                   labelText: 'Password',
                                   errorText:
@@ -336,19 +338,23 @@ class RegistrationPageState extends BaseScreenState {
                           height: 50,
                           padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                           child: RaisedButton(
-                            textColor: Colors.white,
-                            color: Colors.blue,
-                            child: Text(
-                              'SignUp',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            onPressed: signUpUser,
-                          )),
+                              textColor: buttoncolorwhite,
+                              color: buttoncolorblue,
+                              child: Text(
+                                'SignUp',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              onPressed: () => UserMethod.signUpUser(
+                                  context,
+                                  _emailController.text,
+                                  fnameController.text,
+                                  lnameController.text,
+                                  _passwordController.text))),
                       Container(
                           child: Row(
                         children: <Widget>[
                           FlatButton(
-                            textColor: Colors.blue,
+                            textColor: buttoncolorblue,
                             child: Text(
                               'Login',
                               style: TextStyle(fontSize: 15),

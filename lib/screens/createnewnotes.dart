@@ -3,9 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fundonotes/api/firebasemanager.dart';
 import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/models/common/constants.dart';
+import 'package:fundonotes/screens/homescreen.dart';
+import 'package:fundonotes/view/textformwidget.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class CreateNewNote extends BaseScreen {
   @override
@@ -18,35 +21,37 @@ class CreateNewNote_state extends BaseScreenState {
   FocusNode titleFocus = new FocusNode();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
-  var loggedInUser;
+  //String? userId = _auth.currentUser!.uid;
+
+  String? uid;
+
   final CollectionReference _notesCollection =
-      FirebaseFirestore.instance.collection('notes');
-
-  Future<User> getCurrentUser() async {
-    final user = await _auth.currentUser;
-    loggedInUser = user!.uid;
-
-    return loggedInUser;
-  }
+      FirebaseFirestore.instance.collection('users');
 
   uploadData() async {
-    Map<String, dynamic> data = <String, dynamic>{
-      'uid': loggedInUser,
+    // String noteId = _notesCollection;
+    String uid = _auth.currentUser!.uid;
+
+    print(uid);
+    print(
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    DocumentReference<Map<String, dynamic>> noteDoc =
+        _notesCollection.doc(uid).collection('notes').doc();
+    Map<String, dynamic> data1 = <String, dynamic>{
+      'id': noteDoc.id,
       'title': titleController.text,
-      'description': bodyController.text
+      'description': bodyController.text,
+      'created': DateTime.now(),
     };
-    await _notesCollection
-        .add(data)
-        .whenComplete(() => print("User added notes"))
-        .catchError((e) => print(e));
+    noteDoc.set(data1);
+    String noteid = noteDoc.id;
+    print(noteid);
   }
-
-
 
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
+    // getCurrentUser();
     titleController = TextEditingController();
   }
 
@@ -64,8 +69,15 @@ class CreateNewNote_state extends BaseScreenState {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              uploadData();
-              Navigator.pop(context);
+              var title = titleController.text;
+              var notes = bodyController.text;
+              if (title.isEmpty && notes.isEmpty) {
+                print('Notes required');
+                Navigator.pop(context);
+              } else {
+                uploadData();
+                Navigator.pop(context);
+              }
             },
             icon: Icon(
               Icons.arrow_back,
@@ -97,39 +109,26 @@ class CreateNewNote_state extends BaseScreenState {
         child: Column(
           children: <Widget>[
             Container(
-              child: TextFormField(
-                controller: titleController,
-                textInputAction: TextInputAction.newline,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                style: new TextStyle(
-                    fontStyle: FontStyle.normal,
-                    fontSize: 20,
-                    color: HexColor('#606E74')),
-                decoration: InputDecoration(
-                  hintText: 'Title',
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
+                child: TextFormWidget(
+              controller: titleController,
+              hint: 'Title',
+            )),
             Expanded(
               child: Container(
-                child: TextFormField(
+                child: TextFormWidget(
                   controller: bodyController,
-                  textInputAction: TextInputAction.newline,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  style: new TextStyle(
-                      fontStyle: FontStyle.normal,
-                      fontSize: 15,
-                      color: HexColor('#606E74')),
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    border: InputBorder.none,
-                  ),
+                  hint: 'Description',
                 ),
               ),
             )
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(onPressed: () {}, icon: Icon(Icons.color_lens_outlined)),
           ],
         ),
       ),
