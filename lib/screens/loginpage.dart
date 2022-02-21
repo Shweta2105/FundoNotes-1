@@ -2,35 +2,53 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+//import 'package:fundonotes/api/networkmanager.dart';
 import 'package:fundonotes/basescreen.dart';
-import 'package:fundonotes/models/common/styles.dart';
+import 'package:fundonotes/models/common/customsnackbar.dart';
+
 import 'package:fundonotes/resources/authmethod.dart';
-import 'package:fundonotes/utils/usermethod.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fundonotes/models/common/constants.dart';
 
 class LoginPage extends BaseScreen {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
-  LoginPageState createState() => new LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
 class LoginPageState extends BaseScreenState {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  // User? loggedInUser;
-
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  FocusNode _emailFocus = new FocusNode();
-  FocusNode _passwordFocus = new FocusNode();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
 
   bool emailValid = true;
   bool passwordValid = true;
-  @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController();
-    //getData();
+
+  loginUser() async {
+    String result = await AuthMethod.loginUser(
+        email: _emailController.text, password: _passwordController.text);
+
+    if (result == 'success') {
+      Navigator.pushNamed(context, '/homescreen');
+      //snackbar
+      CustomSnackbar.show(context, "Login Successfull...!");
+    } else {
+      //snackbar
+      CustomSnackbar.show(context, "Login Failed... Check Id and password");
+    }
+    return result;
+    // bool isLoggedIn = await NetworkManager.login(
+    //     _emailController.text, _passwordController.text);
+    // print("success");
+    // print(
+    //     "999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
+    // if (isLoggedIn == true) {
+    //   Navigator.pushNamed(context, '/homescreen');
+    // } else {
+    //   CustomSnackbar.show(context, "loginFailed try again");
+    // }
   }
 
   _emailRequestFocus() {
@@ -45,6 +63,12 @@ class LoginPageState extends BaseScreenState {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backcolor,
@@ -62,23 +86,23 @@ class LoginPageState extends BaseScreenState {
         centerTitle: true,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             gradient: LinearGradient(
                 colors: [Colors.white, Colors.greenAccent, Colors.yellowAccent],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter)),
         child: Center(
           child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: ListView(
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Card(
                     color: whitebackcolor,
                     elevation: 10,
-                    child: Container(
+                    child: SizedBox(
                       height: 100,
                       width: 135,
                       child: Stack(
@@ -93,7 +117,7 @@ class LoginPageState extends BaseScreenState {
                 ),
                 Container(
                   height: 100,
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: TextField(
                     controller: _emailController,
                     focusNode: _emailFocus,
@@ -106,7 +130,7 @@ class LoginPageState extends BaseScreenState {
                       }
                       setState(() {});
                     },
-                    style: new TextStyle(
+                    style: TextStyle(
                         fontStyle: FontStyle.normal,
                         fontSize: 20,
                         color: textcolor),
@@ -134,49 +158,46 @@ class LoginPageState extends BaseScreenState {
                 ),
                 Container(
                   height: 100,
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  child: Container(
-                    child: SizedBox(
-                      child: TextField(
-                        obscureText: true,
-                        controller: _passwordController,
-                        focusNode: _passwordFocus,
-                        onTap: _passwordRequestFocus,
-                        onChanged: (value) {
-                          if (passwordRegExp.hasMatch(value)) {
-                            passwordValid = true;
-                          } else {
-                            passwordValid = false;
-                          }
-                          setState(() {});
-                        },
-                        style: new TextStyle(
-                            fontStyle: FontStyle.normal,
-                            fontSize: 20,
-                            color: textcolor),
-                        decoration: InputDecoration(
-                            labelText: 'Password',
-                            errorText:
-                                passwordValid ? null : "Invalid password",
-                            errorStyle: const TextStyle(fontSize: 15),
-                            labelStyle: TextStyle(
-                                color: _passwordFocus.hasFocus
-                                    ? passwordValid
-                                        ? Colors.amberAccent
-                                        : Colors.red
-                                    : HexColor('#658292')),
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: HexColor('#658292'))),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(4)),
-                              borderSide: _passwordFocus.hasFocus
-                                  ? const BorderSide(
-                                      color: Colors.amber, width: 1.2)
-                                  : BorderSide(color: HexColor('#658292')),
-                            )),
-                      ),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: SizedBox(
+                    child: TextField(
+                      obscureText: true,
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      onTap: _passwordRequestFocus,
+                      onChanged: (value) {
+                        if (passwordRegExp.hasMatch(value)) {
+                          passwordValid = true;
+                        } else {
+                          passwordValid = false;
+                        }
+                        setState(() {});
+                      },
+                      style: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          fontSize: 20,
+                          color: textcolor),
+                      decoration: InputDecoration(
+                          labelText: 'Password',
+                          errorText: passwordValid ? null : "Invalid password",
+                          errorStyle: const TextStyle(fontSize: 15),
+                          labelStyle: TextStyle(
+                              color: _passwordFocus.hasFocus
+                                  ? passwordValid
+                                      ? Colors.amberAccent
+                                      : Colors.red
+                                  : HexColor('#658292')),
+                          border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: HexColor('#658292'))),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(4)),
+                            borderSide: _passwordFocus.hasFocus
+                                ? const BorderSide(
+                                    color: Colors.amber, width: 1.2)
+                                : BorderSide(color: HexColor('#658292')),
+                          )),
                     ),
                   ),
                 ),
@@ -201,37 +222,34 @@ class LoginPageState extends BaseScreenState {
                     )),
                 Container(
                   height: 50,
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  // ignore: deprecated_member_use
                   child: RaisedButton(
                       textColor: buttoncolorwhite,
                       color: buttoncolorblue,
-                      child: Text('Login',
+                      child: const Text('Login',
                           style: TextStyle(
                             fontSize: 15,
                           )),
-                      onPressed: () {
-                        UserMethod().loginUser(context, _emailController.text,
-                            _passwordController.text);
-                      }),
+                      onPressed: loginUser),
                 ),
-                Container(
-                    child: Row(
+                Row(
                   children: <Widget>[
-                    Text('Does not have account?'),
-                    FlatButton(
-                      textColor: buttoncolorblue,
-                      child: Text(
-                        'Sign in',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/registrationpage');
-                        //signup screen
-                      },
-                    )
+                const Text('Does not have account?'),
+                FlatButton(
+                  textColor: buttoncolorblue,
+                  child: const Text(
+                    'Sign in',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/registrationpage');
+                    //signup screen
+                  },
+                )
                   ],
                   mainAxisAlignment: MainAxisAlignment.center,
-                )),
+                ),
               ],
             ),
           ),

@@ -16,14 +16,16 @@ class FirebaseManager1 {
   static String? uid;
 
   //static getAllNotes() {}
-  Future<List<Notes>> _getAllNotes() async {
+  Future<List<Notes>> getAllNotes() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-        await _userCollection.doc(uid).collection('notes').get();
+        await _firestore.collection('users').doc(uid).collection('notes').get();
     print("----------------------------------------------------------");
     List<Notes> notes = snapshot.docs
         .map(
           (doc) => Notes(
-              title: doc['title'], description: doc['description'], id: ''),
+              title: doc['title'],
+              description: doc['description'],
+              id: doc['id']),
         )
         .toList();
 

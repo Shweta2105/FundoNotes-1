@@ -28,10 +28,10 @@ class _NoteCardState extends State<NoteCard> {
         },
         child: Card(
             child: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Container(
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(0),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(
@@ -43,7 +43,7 @@ class _NoteCardState extends State<NoteCard> {
                             color: Colors.blueGrey.shade100,
                             blurRadius: 1,
                             spreadRadius: 0.0,
-                            offset: Offset(2.0, 2.0))
+                            offset: const Offset(2.0, 2.0))
                       ]),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,19 +51,19 @@ class _NoteCardState extends State<NoteCard> {
                         Text(
                           widget.note.title ?? "",
                           textAlign: TextAlign.start,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 5,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 6,
                         ),
                         Text(
                           widget.note.description ?? "",
                           textAlign: TextAlign.start,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
                           ),

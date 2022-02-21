@@ -6,12 +6,14 @@ class User {
   String? username;
   String? email;
   String? photoUrl;
+  String? accesstoken;
 
   User({
     this.uid,
     this.username,
     this.email,
     this.photoUrl,
+    this.accesstoken,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {

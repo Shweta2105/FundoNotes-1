@@ -2,30 +2,31 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+//import 'package:fundonotes/api/networkmanager.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:fundonotes/models/common/constants.dart';
+import 'package:fundonotes/models/common/customsnackbar.dart';
 import 'package:fundonotes/resources/authmethod.dart';
 import 'package:fundonotes/utils/pickimage.dart';
-import 'package:fundonotes/utils/usermethod.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegistrationPage extends BaseScreen {
   const RegistrationPage({Key? key}) : super(key: key);
   @override
-  RegistrationPageState createState() => new RegistrationPageState();
+  RegistrationPageState createState() => RegistrationPageState();
 }
 
 class RegistrationPageState extends BaseScreenState {
-  TextEditingController fnameController = TextEditingController();
-  TextEditingController lnameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _firstnameController = TextEditingController();
+  final TextEditingController _lastnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  FocusNode fnameFocus = new FocusNode();
-  FocusNode lnameFocus = new FocusNode();
-  FocusNode _passwordFocus = new FocusNode();
-  FocusNode _emailFocus = new FocusNode();
+  final FocusNode _fnameFocus = FocusNode();
+  final FocusNode _lnameFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
 
   bool fnameValid = true;
   bool lnameValid = true;
@@ -33,19 +34,16 @@ class RegistrationPageState extends BaseScreenState {
   bool passwordValid = true;
   bool matchPassword = true;
   Uint8List? _image;
-  void initState() {
-    super.initState();
-  }
 
   _fnameRequestFocus() {
     setState(() {
-      FocusScope.of(context).requestFocus(fnameFocus);
+      FocusScope.of(context).requestFocus(_fnameFocus);
     });
   }
 
   _lnameRequestFocus() {
     setState(() {
-      FocusScope.of(context).requestFocus(lnameFocus);
+      FocusScope.of(context).requestFocus(_lnameFocus);
     });
   }
 
@@ -68,20 +66,39 @@ class RegistrationPageState extends BaseScreenState {
     });
   }
 
-  // signUpUser() async {
-  //   String result = await AuthMethod.SignupUser(
-  //     email: _emailController.text,
-  //     username: fnameController.text,
-  //     password: _passwordController.text,
-  //     file: _image!,
-  //   );
-  //   if (result == 'success') {
-  //     Navigator.pop(context);
-  //   } else {
-  //     //show snackbar to user
+  signUpUser() async {
+    //This FireBase
+    String result = await AuthMethod.SignupUser(
+      email: _emailController.text,
+      username: _firstnameController.text,
+      password: _passwordController.text,
+      file: _image!,
+    );
+    if (result == 'success') {
+      Navigator.pop(context);
+      CustomSnackbar.show(context, 'SignUp successful...!!');
+    } else {
+      //show snackbar to user
+      CustomSnackbar.show(context, 'SignUp failed....try again');
+    }
 
-  //   }
-  // }
+    //this Network code
+
+    // User networkuser = await NetworkManager.registration(
+    //     "cris@gmail.com", "cris", "john", "123456");
+
+    // print("success");
+    // print(
+    //     "999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
+    // Navigator.pop(context);
+
+    // return networkuser;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +181,8 @@ class RegistrationPageState extends BaseScreenState {
                         height: 100,
                         padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
                         child: TextField(
-                          controller: fnameController,
-                          focusNode: fnameFocus,
+                          controller: _firstnameController,
+                          focusNode: _fnameFocus,
                           onTap: _fnameRequestFocus,
                           onChanged: (value) {
                             fnameValid = value.length <= 15;
@@ -185,7 +202,7 @@ class RegistrationPageState extends BaseScreenState {
                                   fnameValid ? null : "Invalid first name",
                               errorStyle: const TextStyle(fontSize: 15),
                               labelStyle: TextStyle(
-                                  color: fnameFocus.hasFocus
+                                  color: _fnameFocus.hasFocus
                                       ? fnameValid
                                           ? Colors.amberAccent
                                           : Colors.red
@@ -196,7 +213,7 @@ class RegistrationPageState extends BaseScreenState {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(4)),
-                                borderSide: fnameFocus.hasFocus
+                                borderSide: _fnameFocus.hasFocus
                                     ? const BorderSide(
                                         color: Colors.amber, width: 1.2)
                                     : BorderSide(color: HexColor('#658292')),
@@ -207,15 +224,15 @@ class RegistrationPageState extends BaseScreenState {
                         height: 100,
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                         child: TextField(
-                          controller: lnameController,
-                          focusNode: lnameFocus,
+                          controller: _lastnameController,
+                          focusNode: _lnameFocus,
                           onTap: _lnameRequestFocus,
                           onChanged: (value) {
                             lnameValid = value.length <= 15;
 
                             setState(() {});
                           },
-                          style: new TextStyle(
+                          style: TextStyle(
                               fontStyle: FontStyle.normal,
                               fontSize: 20,
                               color: textcolor),
@@ -225,7 +242,7 @@ class RegistrationPageState extends BaseScreenState {
                                   lnameValid ? null : "Invalid last name",
                               errorStyle: const TextStyle(fontSize: 15),
                               labelStyle: TextStyle(
-                                  color: lnameFocus.hasFocus
+                                  color: _lnameFocus.hasFocus
                                       ? lnameValid
                                           ? Colors.amberAccent
                                           : Colors.red
@@ -236,7 +253,7 @@ class RegistrationPageState extends BaseScreenState {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(4)),
-                                borderSide: lnameFocus.hasFocus
+                                borderSide: _lnameFocus.hasFocus
                                     ? const BorderSide(
                                         color: Colors.amber, width: 1.2)
                                     : BorderSide(color: HexColor('#658292')),
@@ -258,7 +275,7 @@ class RegistrationPageState extends BaseScreenState {
                             }
                             setState(() {});
                           },
-                          style: new TextStyle(
+                          style: TextStyle(
                               fontStyle: FontStyle.normal,
                               fontSize: 20,
                               color: textcolor),
@@ -303,7 +320,7 @@ class RegistrationPageState extends BaseScreenState {
                                 }
                                 setState(() {});
                               },
-                              style: new TextStyle(
+                              style: TextStyle(
                                   fontStyle: FontStyle.normal,
                                   fontSize: 20,
                                   color: textcolor),
@@ -344,12 +361,7 @@ class RegistrationPageState extends BaseScreenState {
                                 'SignUp',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              onPressed: () => UserMethod.signUpUser(
-                                  context,
-                                  _emailController.text,
-                                  fnameController.text,
-                                  lnameController.text,
-                                  _passwordController.text))),
+                              onPressed: signUpUser)),
                       Container(
                           child: Row(
                         children: <Widget>[
