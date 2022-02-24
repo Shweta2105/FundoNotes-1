@@ -4,8 +4,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fundonotes/api/firebasemanager.dart';
+import 'package:fundonotes/api/sqlmanager.dart';
 import 'package:fundonotes/basescreen.dart';
-import 'package:fundonotes/models/common/constants.dart';
+import 'package:fundonotes/models/notes.dart';
 import 'package:fundonotes/screens/homescreen.dart';
 import 'package:fundonotes/view/textformwidget.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -48,6 +49,15 @@ class CreateNewNote_state extends BaseScreenState {
     print(noteid);
   }
 
+  addNote() async {
+    final note = Notes(
+        title: titleController.text,
+        description: bodyController.text,
+        dateTime: DateTime.now());
+
+    await SqlManager.instance.insertNewNote(note);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +85,8 @@ class CreateNewNote_state extends BaseScreenState {
                 print('Notes required');
                 Navigator.pop(context);
               } else {
-                uploadData();
+                // uploadData();
+                addNote();
                 Navigator.pop(context);
               }
             },

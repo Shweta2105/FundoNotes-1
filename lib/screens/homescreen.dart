@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fundonotes/api/firebasemanager.dart';
+import 'package:fundonotes/api/sqlmanager.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:fundonotes/models/notes.dart';
 
@@ -30,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Notes> filterNotes = [];
   QueryDocumentSnapshot? lastDocument;
   final ScrollController _scrollController = ScrollController();
-  bool pageLoading = false, ifMoreAvailable = true;
+  bool isPageLoading = false, hasMoreNotes = true;
 
   Icon customIcon = const Icon(
     Icons.search,
@@ -54,66 +55,80 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   pageFetch() async {
-    if (ifMoreAvailable == false) {
+    if (hasMoreNotes == false) {
       return;
     }
     setState(() {
-      pageLoading = true;
+      isPageLoading = true;
     });
 
     List<Notes> temp = await FirebaseManager1.fetchNotes();
     if (temp.length < 10) {
-      ifMoreAvailable = false;
+      hasMoreNotes = false;
     }
     if (temp.isNotEmpty) {
       noteList.addAll(temp);
     }
     setState(() {
-      pageLoading = !pageLoading;
+      isPageLoading = !isPageLoading;
     });
   }
 
   fetchMorePage() async {
     print("--------------in more page method------------------");
-    if (ifMoreAvailable == false) {
+    if (hasMoreNotes == false) {
       print("no more data");
       return;
     }
 
     setState(() {
-      pageLoading = true;
+      isPageLoading = true;
     });
 
     List<Notes> temp = await FirebaseManager1.fetchMoreNotes();
-    print("////////////${temp.length}//////////////////");
-    print(noteList.length);
+
     noteList.addAll(temp);
     print(noteList.length);
     if (temp.length < 10) {
-      ifMoreAvailable = false;
+      hasMoreNotes = false;
     }
+    setState(() {
+      isPageLoading = false;
+    });
+  }
+
+  Future<List<Notes>> getNotes() async {
+    print("Before------------------------------");
+    List<Notes> notes = await SqlManager.instance.getAllNotes();
+    print("After-------------------------");
+    print(notes);
+    if (notes.isNotEmpty) {
+      noteList.addAll(notes);
+    }
+    return notes;
   }
 
   @override
   void initState() {
     super.initState();
     uid = _auth.currentUser?.uid;
-    printData();
+    getNotes();
     pageFetch();
+    configureScrollController();
+  }
 
-    _scrollController.addListener(() async {
+  configureScrollController() {
+    _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
-          !pageLoading) {
+          !isPageLoading) {
         print(".....................................................");
-        await fetchMorePage();
+        fetchMorePage();
         print("---------------${noteList.length}-------------");
         print("============done==========");
       }
     });
   }
-
-  configureScrollListener() {}
 
   Widget build(BuildContext context) {
     print("===========================================");
@@ -226,18 +241,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   filterNotes.isEmpty ? noteList.length : filterNotes.length,
               itemBuilder: (BuildContext context, int index) {
                 // if(index%10 == 0)
-                print(
-                    "555555555555555555inside listview55-----------------noteList${[
-                  index
-                ]}");
-                print(noteList.length);
 
                 Notes note =
                     filterNotes.isEmpty ? noteList[index] : filterNotes[index];
 
                 return NoteCard(note: note);
               }),
-      // }),
+
+      // FutureBuilder(
+      //     future: getNotes(),
+      //     builder: (context, AsyncSnapshot<List<Notes>> noteData) {
+      //       if (noteData.connectionState == ConnectionState.waiting) {
+      //         print("ConnectionState.waiting state");
+      //         return Center(
+      //           child: CircularProgressIndicator(),
+      //         );
+      //       } else {
+      //         if (noteData.data == null) {
+      //           return const Center(
+      //             child: Text("no notes present yet...!"),
+      //           );
+      //         } else {
+      //           return ListView.builder(
+      //               itemCount: noteData.data!.length,
+      //               itemBuilder: (BuildContext context, int index) {
+      //                 List<Notes> noteList = noteData.data ?? [];
+      //                 //if(noteList.length)
+      //                 Notes note = noteList[index];
+
+      //                 return NoteCard(note: note);
+      //               });
+      //         }
+      //       }
+      //     }),
       floatingActionButton: FloatingActionButton(
         foregroundColor: Colors.amber,
         focusColor: Colors.white10,
@@ -306,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //               child: CircularProgressIndicator(),
 //             );
 //           }
-//           return ListView.builder(
+//          return  ListView.builder(
 //               itemCount: snapshot.data?.length,
 //               itemBuilder: (BuildContext context, int index) {
 //                 List<Notes> noteList = snapshot.data ?? [];

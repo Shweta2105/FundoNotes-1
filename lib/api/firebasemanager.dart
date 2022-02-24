@@ -63,18 +63,27 @@ class FirebaseManager1 {
   Future<void> uploadData(
       {required String title, required String description}) async {
     String uid = _auth.currentUser!.uid;
-    Map<String, dynamic> data = <String, dynamic>{
-      //'uid': loggedInUser,
-      'title': title,
-      'description': description
-    };
-    await _userCollection
-        .doc(uid)
-        .collection('notes')
-        .add(data)
-        .whenComplete(() => print("User added notes"))
-        .catchError((e) => print(e));
     print(uid);
+    print(
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    DocumentReference<Map<String, dynamic>> noteDoc =
+        _userCollection.doc(uid).collection('notes').doc();
+    Map<String, dynamic> data1 = <String, dynamic>{
+      'id': noteDoc.id,
+      'title': title,
+      'description': description,
+      'created': DateTime.now(),
+    };
+    noteDoc.set(data1);
+    String noteid = noteDoc.id;
+    print(noteid);
+    // await _userCollection
+    //     .doc(uid)
+    //     .collection('notes')
+    //     .add(data)
+    //     .whenComplete(() => print("User added notes"))
+    //     .catchError((e) => print(e));
+    // print(uid);
   }
 
   static Future<void> deleteData({
@@ -101,6 +110,8 @@ class FirebaseManager1 {
         .collection('notes');
     DocumentReference _noteRef = _noteCollection.doc(docId);
     await _noteRef.update({'title': title, 'description': description});
+    // ignore: unnecessary_brace_in_string_interps
+    print(_noteRef);
     print("update method####################################");
   }
 }

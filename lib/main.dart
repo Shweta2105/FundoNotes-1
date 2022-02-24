@@ -27,7 +27,8 @@ void main() async {
       primarySwatch: Colors.blue,
     ),
     debugShowCheckedModeBanner: false,
-    initialRoute: '/loginpage',
+    initialRoute: '/homescreen',
+    //'/loginpage',
     routes: {
       '/loginpage': (context) => LoginPage(),
       '/registrationpage': (context) => RegistrationPage(),
