@@ -7,6 +7,7 @@ import 'package:fundonotes/api/firebasemanager.dart';
 import 'package:fundonotes/api/sqlmanager.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:fundonotes/models/notes.dart';
+import 'package:fundonotes/resources/notificationplugins.dart';
 import 'package:fundonotes/screens/homescreen.dart';
 import 'package:fundonotes/view/textformwidget.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -29,25 +30,25 @@ class CreateNewNote_state extends BaseScreenState {
   final CollectionReference _notesCollection =
       FirebaseFirestore.instance.collection('users');
 
-  uploadData() async {
-    // String noteId = _notesCollection;
-    String uid = _auth.currentUser!.uid;
+  // uploadData() async {
+  //   // String noteId = _notesCollection;
+  //   String uid = _auth.currentUser!.uid;
 
-    print(uid);
-    print(
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    DocumentReference<Map<String, dynamic>> noteDoc =
-        _notesCollection.doc(uid).collection('notes').doc();
-    Map<String, dynamic> data1 = <String, dynamic>{
-      'id': noteDoc.id,
-      'title': titleController.text,
-      'description': bodyController.text,
-      'created': DateTime.now(),
-    };
-    noteDoc.set(data1);
-    String noteid = noteDoc.id;
-    print(noteid);
-  }
+  //   print(uid);
+  //   print(
+  //       "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  //   DocumentReference<Map<String, dynamic>> noteDoc =
+  //       _notesCollection.doc(uid).collection('notes').doc();
+  //   Map<String, dynamic> data1 = <String, dynamic>{
+  //     'id': noteDoc.id,
+  //     'title': titleController.text,
+  //     'description': bodyController.text,
+  //     'created': DateTime.now(),
+  //   };
+  //   noteDoc.set(data1);
+  //   String noteid = noteDoc.id;
+  //   print(noteid);
+  // }
 
   addNote() async {
     final note = Notes(
@@ -85,8 +86,9 @@ class CreateNewNote_state extends BaseScreenState {
                 print('Notes required');
                 Navigator.pop(context);
               } else {
-                // uploadData();
-                addNote();
+                FirebaseManager1.uploadData(title: title, description: notes);
+                notificationPlugins.showNotification('new note created at ');
+
                 Navigator.pop(context);
               }
             },

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fundonotes/api/firebasemanager.dart';
 import 'package:fundonotes/api/sqlmanager.dart';
-import 'package:fundonotes/basescreen.dart';
+import 'package:fundonotes/models/common/constants.dart';
 import 'package:fundonotes/models/notes.dart';
-
+import 'package:fundonotes/resources/notificationplugins.dart';
 import 'package:fundonotes/screens/createnewnotes.dart';
 import 'package:fundonotes/view/notecard.dart';
 
@@ -25,12 +25,12 @@ CollectionReference ref = FirebaseFirestore.instance.collection('users');
 String? uid;
 var searchString;
 TextEditingController searchTextEdittingController = TextEditingController();
+List<Notes> noteList = [];
+List<Notes> filterNotes = [];
+
+final ScrollController _scrollController = ScrollController();
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Notes> noteList = [];
-  List<Notes> filterNotes = [];
-  QueryDocumentSnapshot? lastDocument;
-  final ScrollController _scrollController = ScrollController();
   bool isPageLoading = false, hasMoreNotes = true;
 
   Icon customIcon = const Icon(
@@ -39,21 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   );
   Widget customSearchBar = const Text("");
 
-  printData() async {
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('users').doc(uid).collection('notes').get();
-    print("----------------------------------------------------------");
-    snapshot.docs
-        .map((doc) => {
-              // ignore: avoid_print
-              print(doc['title']),
-              print(doc['description']),
-              print("++++++++++++++++++++++++++++++++++++++++++++++++++"),
-            })
-        .toList();
-    print("++++++++++++++++++++++++++++++++++++++++++++++++++");
-  }
-
   pageFetch() async {
     if (hasMoreNotes == false) {
       return;
@@ -61,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isPageLoading = true;
     });
-
     List<Notes> temp = await FirebaseManager1.fetchNotes();
     if (temp.length < 10) {
       hasMoreNotes = false;
@@ -97,24 +81,27 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<List<Notes>> getNotes() async {
-    print("Before------------------------------");
-    List<Notes> notes = await SqlManager.instance.getAllNotes();
-    print("After-------------------------");
-    print(notes);
-    if (notes.isNotEmpty) {
-      noteList.addAll(notes);
-    }
-    return notes;
+  onNotificationInLowerVersions(receivedNotification) {}
+
+  onNotificationClick(payload) {
+    debugPrint("payload : $payload");
+    showDialog(
+      context: context,
+      builder: (_) => new AlertDialog(
+        title: new Text('Notification'),
+        content: new Text('$payload'),
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
     uid = _auth.currentUser?.uid;
-    getNotes();
     pageFetch();
     configureScrollController();
+    notificationPlugins.setListenerForLowerVersions(onNotificationClick);
+    notificationPlugins.setOnNotificationClick(onNotificationClick);
   }
 
   configureScrollController() {
@@ -140,9 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0.0,
         backwardsCompatibility: false,
         systemOverlayStyle:
-            SystemUiOverlayStyle(statusBarColor: Colors.white10),
+            SystemUiOverlayStyle(statusBarColor: whitebackcolor),
         automaticallyImplyLeading: true,
-        backgroundColor: Colors.white10,
+        backgroundColor: whitebackcolor,
         title: customSearchBar,
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(20),
@@ -151,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 52,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
+                color: whitebackcolor,
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.grey,
@@ -165,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.menu,
                         size: 30,
                       ),
@@ -225,55 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: //_changeView(),
           //GridviewNotes(),
-          // FutureBuilder<List<Notes>>(
-          //     future: noteList,
-          //     builder:
-          //         (BuildContext context, AsyncSnapshot<List<Notes>> snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         print("ConnectionState.waiting state");
-          //         return Center(
-          //           child: CircularProgressIndicator(),
-          //         );
-          //       }
-          ListView.builder(
-              controller: _scrollController,
-              itemCount:
-                  filterNotes.isEmpty ? noteList.length : filterNotes.length,
-              itemBuilder: (BuildContext context, int index) {
-                // if(index%10 == 0)
-
-                Notes note =
-                    filterNotes.isEmpty ? noteList[index] : filterNotes[index];
-
-                return NoteCard(note: note);
-              }),
-
-      // FutureBuilder(
-      //     future: getNotes(),
-      //     builder: (context, AsyncSnapshot<List<Notes>> noteData) {
-      //       if (noteData.connectionState == ConnectionState.waiting) {
-      //         print("ConnectionState.waiting state");
-      //         return Center(
-      //           child: CircularProgressIndicator(),
-      //         );
-      //       } else {
-      //         if (noteData.data == null) {
-      //           return const Center(
-      //             child: Text("no notes present yet...!"),
-      //           );
-      //         } else {
-      //           return ListView.builder(
-      //               itemCount: noteData.data!.length,
-      //               itemBuilder: (BuildContext context, int index) {
-      //                 List<Notes> noteList = noteData.data ?? [];
-      //                 //if(noteList.length)
-      //                 Notes note = noteList[index];
-
-      //                 return NoteCard(note: note);
-      //               });
-      //         }
-      //       }
-      //     }),
+          ListDisplay(),
       floatingActionButton: FloatingActionButton(
         foregroundColor: Colors.amber,
         focusColor: Colors.white10,
@@ -294,87 +233,73 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-} 
+}
 
-// class GridviewNotes extends StatelessWidget {
-//   const GridviewNotes({
-//     Key? key,
-//   }) : super(key: key);
+class GridviewNotes extends StatelessWidget {
+  const GridviewNotes({
+    Key? key,
+  }) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return FutureBuilder<List<Notes>>(
-//         future: _getAllNotes(),
-//         builder: (BuildContext context, AsyncSnapshot<List<Notes>> snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             print("ConnectionState.waiting state");
-//             return Center(
-//               child: CircularProgressIndicator(),
-//             );
-//           }
-//           return GridView.builder(
-//             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//                 crossAxisCount: 2),
-//             itemCount: snapshot.data?.length,
-//             itemBuilder: (BuildContext context, int index) {
-//               Notes note = snapshot.data![index];
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Notes>>(
+        // future: _getAllNotes(),
+        builder: (BuildContext context, AsyncSnapshot<List<Notes>> snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        print("ConnectionState.waiting state");
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      return GridView.builder(
+        gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+        itemCount: snapshot.data?.length,
+        itemBuilder: (BuildContext context, int index) {
+          Notes note = snapshot.data![index];
 
-//               return NoteCard(note: note);
-//             },
-//           );
-//         });
-//   }
-// }
+          return NoteCard(note: note);
+        },
+      );
+    });
+  }
+}
 
-// class ListDisplay extends StatelessWidget {
-//   const ListDisplay({
-//     Key? key,
-//   }) : super(key: key);
+class ListDisplay extends StatelessWidget {
+  const ListDisplay({
+    Key? key,
+  }) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return FutureBuilder<List<Notes>>(
-//         future: _getAllNotes(),
-//         builder: (BuildContext context, AsyncSnapshot<List<Notes>> snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             print("ConnectionState.waiting state");
-//             return Center(
-//               child: CircularProgressIndicator(),
-//             );
-//           }
-//          return  ListView.builder(
-//               itemCount: snapshot.data?.length,
-//               itemBuilder: (BuildContext context, int index) {
-//                 List<Notes> noteList = snapshot.data ?? [];
-//                 //if(noteList.length)
-//                 Notes note = noteList[index];
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Notes>>(
+        // future: noteList,
+        builder: (BuildContext context, AsyncSnapshot<List<Notes>> snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        print("ConnectionState.waiting state");
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      return ListView.builder(
+          controller: _scrollController,
+          itemCount: filterNotes.isEmpty ? noteList.length : filterNotes.length,
+          itemBuilder: (BuildContext context, int index) {
+            // if(index%10 == 0)
 
-//                 return NoteCard(note: note);
-//               });
-//         });
-//   }
-// }
+            Notes note =
+                filterNotes.isEmpty ? noteList[index] : filterNotes[index];
 
-// _changeView() {
-//   if (view == false) {
-//     return ListDisplay();
-//   } else {
-//     return GridviewNotes();
-//   }
-// }
+            return NoteCard(note: note);
+          });
+    });
+  }
+}
 
-// Future<List<Notes>> _getAllNotes() async {
-//   QuerySnapshot<Map<String, dynamic>> snapshot =
-//       await _firestore.collection('users').doc(uid).collection('notes').get();
-//   print("----------------------------------------------------------");
-//   List<Notes> notes = snapshot.docs
-//       .map(
-//         (doc) => Notes(
-//             title: doc['title'],
-//             description: doc['description'],
-//             id: doc['id']),
-//       )
-//       .toList();
-
-//   return notes;
-// }
+_changeView() {
+  if (view == false) {
+    return ListDisplay();
+  } else {
+    return GridviewNotes();
+  }
+}

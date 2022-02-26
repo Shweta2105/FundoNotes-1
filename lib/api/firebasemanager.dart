@@ -6,8 +6,6 @@ class FirebaseManager1 {
   static FirebaseAuth _auth = FirebaseAuth.instance;
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final CollectionReference _userCollection =
-      FirebaseFirestore.instance.collection('users');
   static QueryDocumentSnapshot? lastDocument;
 
   //static getAllNotes() {}
@@ -60,14 +58,14 @@ class FirebaseManager1 {
     return notes;
   }
 
-  Future<void> uploadData(
+  static Future<void> uploadData(
       {required String title, required String description}) async {
     String uid = _auth.currentUser!.uid;
     print(uid);
     print(
         "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     DocumentReference<Map<String, dynamic>> noteDoc =
-        _userCollection.doc(uid).collection('notes').doc();
+        _firestore.collection('users').doc(uid).collection('notes').doc();
     Map<String, dynamic> data1 = <String, dynamic>{
       'id': noteDoc.id,
       'title': title,

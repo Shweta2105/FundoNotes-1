@@ -8,6 +8,7 @@ import 'package:fundonotes/api/firebasemanager.dart';
 import 'package:fundonotes/api/sqlmanager.dart';
 import 'package:fundonotes/models/common/constants.dart';
 import 'package:fundonotes/models/notes.dart';
+import 'package:fundonotes/resources/notificationplugins.dart';
 import 'package:fundonotes/screens/homescreen.dart';
 
 class EditNote extends StatefulWidget {
@@ -28,7 +29,7 @@ class EditNote extends StatefulWidget {
 
 class _EditNoteState extends State<EditNote> {
   static FirebaseAuth _auth = FirebaseAuth.instance;
-  late int noteId;
+  String noteId = '';
   String title = '';
   String description = '';
   bool edit = false;
@@ -37,7 +38,7 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-    noteId = widget.note.iid!;
+    noteId = widget.note.id!;
     title = widget.note.title!;
     description = widget.note.description!;
     return Scaffold(
@@ -46,9 +47,10 @@ class _EditNoteState extends State<EditNote> {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              // FirebaseManager1.updateData(
-              //     docId: noteId, title: title, description: description);
-              update();
+              FirebaseManager1.updateData(
+                  docId: noteId, title: title, description: description);
+              notificationPlugins.showNotification('new note created at ');
+
               Navigator.of(context).pop();
             },
             icon: const Icon(
@@ -141,8 +143,7 @@ class _EditNoteState extends State<EditNote> {
                 print("${widget.note.title}");
                 print("${widget.note.description}");
                 print("going to delete query");
-                // await FirebaseManager1.deleteData(docId: widget.note.id!);
-                await SqlManager.instance.deleteNotes(noteId);
+                await FirebaseManager1.deleteData(docId: widget.note.id!);
 
                 Navigator.of(context).pop();
               },
