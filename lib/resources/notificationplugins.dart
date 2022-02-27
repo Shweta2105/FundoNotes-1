@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -18,7 +19,8 @@ class NotificationPlugins {
   }
 
   initializePlatform() {
-    var initializeAndroid = const AndroidInitializationSettings('noti_icon');
+    var initializeAndroid =
+        const AndroidInitializationSettings('fundooicon.jpg');
     initializeSetting = InitializationSettings(android: initializeAndroid);
   }
 
@@ -49,6 +51,19 @@ class NotificationPlugins {
     await flutterLocalNotificationsPlugin.show(
         0, '<b>local check</b>', 'FundooNotes', platform,
         payload: payload! + ' ${time.hour} :${time.minute}');
+  }
+
+  Future<void> scheduleNotification(DateTime scheduleDateTime) async {
+    final sound = 'audio_tone.mp3';
+    var android = AndroidNotificationDetails('CHANNEL_ID 2', 'CHANNEL_NAME 1',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound(sound.split('.').first));
+    var platform = NotificationDetails(android: android);
+    await flutterLocalNotificationsPlugin.schedule(
+        0, 'Reminder ${scheduleDateTime} hrs', '', scheduleDateTime, platform,
+        payload: 'Reminder ${scheduleDateTime} hrs');
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:fundonotes/api/sqlmanager.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:fundonotes/models/notes.dart';
 import 'package:fundonotes/resources/notificationplugins.dart';
+import 'package:fundonotes/screens/addreminder.dart';
 import 'package:fundonotes/screens/homescreen.dart';
 import 'package:fundonotes/view/textformwidget.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -104,7 +105,10 @@ class CreateNewNote_state extends BaseScreenState {
                 color: Colors.black,
               )),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context, builder: (context) => AddReminder());
+              },
               icon: Icon(
                 Icons.notification_add,
                 color: Colors.black,

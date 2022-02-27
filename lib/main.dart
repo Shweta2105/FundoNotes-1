@@ -10,6 +10,7 @@ import 'package:fundonotes/screens/registrationpage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   FirebaseAuth _auth = FirebaseAuth.instance;
   // User? loggedInUser;
@@ -37,28 +38,3 @@ void main() async {
     },
   ));
 }
-
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: "Fundo Notes",
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       debugShowCheckedModeBanner: false,
-//       home: const MyHomePage(
-//         title: ' Fundo Notes',
-//       ),
-//     );
-//   }
-// }
-
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-//   final String title;
