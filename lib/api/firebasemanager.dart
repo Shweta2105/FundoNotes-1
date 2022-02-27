@@ -59,7 +59,9 @@ class FirebaseManager1 {
   }
 
   static Future<void> uploadData(
-      {required String title, required String description}) async {
+      {required String title,
+      required String description,
+      bool? archive}) async {
     String uid = _auth.currentUser!.uid;
     print(uid);
     print(
@@ -70,6 +72,7 @@ class FirebaseManager1 {
       'id': noteDoc.id,
       'title': title,
       'description': description,
+      'archive': archive,
       'created': DateTime.now(),
     };
     noteDoc.set(data1);
@@ -111,5 +114,27 @@ class FirebaseManager1 {
     // ignore: unnecessary_brace_in_string_interps
     print(_noteRef);
     print("update method####################################");
+  }
+
+  static Future<List<Notes>> archiveNotes() async {
+    String? uid = _auth.currentUser?.uid;
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('notes')
+        .where('archive', isEqualTo: true)
+        .get();
+    print("----------------------------------------------------------");
+    List<Notes> notes = snapshot.docs
+        .map(
+          (doc) => Notes(
+              title: doc['title'],
+              description: doc['description'],
+              id: doc['id']),
+        )
+        .toList();
+    lastDocument = snapshot.docs.last;
+
+    return notes;
   }
 }

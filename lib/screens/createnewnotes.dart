@@ -22,6 +22,7 @@ class CreateNewNote_state extends BaseScreenState {
   TextEditingController titleController = new TextEditingController();
   TextEditingController bodyController = new TextEditingController();
   FocusNode titleFocus = new FocusNode();
+  bool archive = false;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
   //String? userId = _auth.currentUser!.uid;
@@ -51,14 +52,14 @@ class CreateNewNote_state extends BaseScreenState {
   //   print(noteid);
   // }
 
-  addNote() async {
-    final note = Notes(
-        title: titleController.text,
-        description: bodyController.text,
-        dateTime: DateTime.now());
+  // addNote() async {
+  //   final note = Notes(
+  //       title: titleController.text,
+  //       description: bodyController.text,
+  //       dateTime: DateTime.now());
 
-    await SqlManager.instance.insertNewNote(note);
-  }
+  //   await SqlManager.instance.insertNewNote(note);
+  // }
 
   @override
   void initState() {
@@ -87,7 +88,8 @@ class CreateNewNote_state extends BaseScreenState {
                 print('Notes required');
                 Navigator.pop(context);
               } else {
-                FirebaseManager1.uploadData(title: title, description: notes);
+                FirebaseManager1.uploadData(
+                    title: title, description: notes, archive: archive);
                 notificationPlugins.showNotification('new note created at ');
 
                 Navigator.pop(context);
@@ -107,14 +109,20 @@ class CreateNewNote_state extends BaseScreenState {
           IconButton(
               onPressed: () {
                 showModalBottomSheet(
-                    context: context, builder: (context) => AddReminder());
+                    context: context,
+                    builder: (context) => const AddReminder());
               },
               icon: Icon(
                 Icons.notification_add,
                 color: Colors.black,
               )),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  archive = !archive;
+                });
+                
+              },
               icon: Icon(
                 Icons.archive,
                 color: Colors.black,

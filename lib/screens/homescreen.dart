@@ -9,6 +9,7 @@ import 'package:fundonotes/models/common/constants.dart';
 import 'package:fundonotes/models/notes.dart';
 import 'package:fundonotes/resources/notificationplugins.dart';
 import 'package:fundonotes/screens/createnewnotes.dart';
+import 'package:fundonotes/view/navigationdrawer.dart';
 import 'package:fundonotes/view/notecard.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ List<Notes> filterNotes = [];
 final ScrollController _scrollController = ScrollController();
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isPageLoading = false, hasMoreNotes = true;
 
   Icon customIcon = const Icon(
@@ -104,6 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
     notificationPlugins.setOnNotificationClick(onNotificationClick);
   }
 
+  noteFetch() {
+    noteList;
+  }
+
   configureScrollController() {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -118,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget build(BuildContext context) {
+    noteFetch();
     print("===========================================");
     String? userid = _auth.currentUser?.uid;
     print(userid);
@@ -152,12 +159,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 30,
-                      ),
-                      color: Colors.black.withOpacity(0.7),
-                      onPressed: () {}),
+                    icon: const Icon(
+                      Icons.menu,
+                      size: 30,
+                    ),
+                    color: Colors.black.withOpacity(0.7),
+                    onPressed: () => _scaffoldKey.currentState!.openDrawer(),
+                  ),
                   SizedBox(
                     width: 0,
                   ),
@@ -210,6 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      drawer: const NavigationDrawer(),
       body: //_changeView(),
           //GridviewNotes(),
           ListDisplay(),

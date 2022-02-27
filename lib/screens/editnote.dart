@@ -31,6 +31,7 @@ class _EditNoteState extends State<EditNote> {
   static FirebaseAuth _auth = FirebaseAuth.instance;
   String noteId = '';
   String title = '';
+  bool? archive;
   String description = '';
   bool edit = false;
 
@@ -71,7 +72,11 @@ class _EditNoteState extends State<EditNote> {
                 color: Colors.black,
               )),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  archive = !archive!;
+                });
+              },
               icon: const Icon(
                 Icons.archive,
                 color: Colors.black,
@@ -155,10 +160,10 @@ class _EditNoteState extends State<EditNote> {
     );
   }
 
-  update() async {
-    final note = widget.note.copy(title: title, description: description);
-    print("--------------inside-------------");
-    print('${note}');
-    await SqlManager.instance.updateNotes(note);
-  }
+  // update() async {
+  //   final note = widget.note.copy(title: title, description: description);
+  //   print("--------------inside-------------");
+  //   print('${note}');
+  //   await SqlManager.instance.updateNotes(note);
+  // }
 }

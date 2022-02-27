@@ -5,10 +5,11 @@ import 'package:flutter/widgets.dart';
 //import 'package:fundonotes/api/networkmanager.dart';
 import 'package:fundonotes/basescreen.dart';
 import 'package:fundonotes/models/common/customsnackbar.dart';
-
 import 'package:fundonotes/resources/authmethod.dart';
+import 'package:fundonotes/screens/homescreen.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:fundonotes/models/common/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends BaseScreen {
   const LoginPage({Key? key}) : super(key: key);
@@ -18,6 +19,9 @@ class LoginPage extends BaseScreen {
 }
 
 class LoginPageState extends BaseScreenState {
+  late SharedPreferences loginData;
+  late bool newuser;
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocus = FocusNode();
@@ -26,11 +30,25 @@ class LoginPageState extends BaseScreenState {
   bool emailValid = true;
   bool passwordValid = true;
 
+  Future<void> getData() async {
+    loginData = await SharedPreferences.getInstance();
+    newuser = (loginData.getBool('login') ?? true);
+
+    if (newuser == false) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext build) => const HomeScreen()));
+    }
+  }
+
   loginUser() async {
     String result = await AuthMethod.loginUser(
         email: _emailController.text, password: _passwordController.text);
 
     if (result == 'success') {
+      loginData.setBool('login', false);
+      loginData.setString('emailId', _emailController.text);
       Navigator.pushNamed(context, '/homescreen');
       //snackbar
       CustomSnackbar.show(context, "Login Successfull...!");
@@ -39,16 +57,6 @@ class LoginPageState extends BaseScreenState {
       CustomSnackbar.show(context, "Login Failed... Check Id and password");
     }
     return result;
-    // bool isLoggedIn = await NetworkManager.login(
-    //     _emailController.text, _passwordController.text);
-    // print("success");
-    // print(
-    //     "999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
-    // if (isLoggedIn == true) {
-    //   Navigator.pushNamed(context, '/homescreen');
-    // } else {
-    //   CustomSnackbar.show(context, "loginFailed try again");
-    // }
   }
 
   _emailRequestFocus() {
@@ -66,6 +74,7 @@ class LoginPageState extends BaseScreenState {
   @override
   void initState() {
     super.initState();
+    getData();
   }
 
   @override
@@ -235,18 +244,18 @@ class LoginPageState extends BaseScreenState {
                 ),
                 Row(
                   children: <Widget>[
-                const Text('Does not have account?'),
-                FlatButton(
-                  textColor: buttoncolorblue,
-                  child: const Text(
-                    'Sign in',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/registrationpage');
-                    //signup screen
-                  },
-                )
+                    const Text('Does not have account?'),
+                    FlatButton(
+                      textColor: buttoncolorblue,
+                      child: const Text(
+                        'Sign in',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/registrationpage');
+                        //signup screen
+                      },
+                    )
                   ],
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),

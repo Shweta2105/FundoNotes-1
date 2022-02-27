@@ -12,26 +12,34 @@ class Notes {
   String? title;
   String? description;
   DateTime? dateTime;
+  bool? archive;
 
-  Notes({this.id, this.iid, this.title, this.description, this.dateTime});
+  Notes(
+      {this.id,
+      this.iid,
+      this.title,
+      this.description,
+      this.dateTime,
+      this.archive});
 
-  // factory Notes.fromJson(Map<String, dynamic> json) {
-  //   return Notes(
-  //       id: json['id'],
-  //       title: json['title'],
-  //       description: json['description'],
-  //       dateTime: json['created'] as DateTime);
-  // }
+  factory Notes.fromJson(Map<String, dynamic> json) {
+    return Notes(
+        id: json['id'],
+        title: json['title'],
+        description: json['description'],
+        archive: json['archive'],
+        dateTime: json['created'] as DateTime);
+  }
 
-  // Map<String, dynamic> toJson() {
-  //   Map<String, dynamic> data = Map<String, dynamic>();
-  //   //data['id'] = this.id;
-  //   data['title'] = this.title;
-  //   data['description'] = this.description;
-  //   // data['created'] = this.dateTime;
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> data = Map<String, dynamic>();
+    //data['id'] = this.id;
+    data['title'] = this.title;
+    data['description'] = this.description;
+    // data['created'] = this.dateTime;
 
-  //   return data;
-  // }
+    return data;
+  }
 
   Map<String, dynamic> toSqJson() => {
         NotesField.id: iid,
